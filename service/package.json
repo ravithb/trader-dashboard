@@ -1,0 +1,28 @@
+{
+  "name": "au.com.alrix.trader",
+  "version": "1.0.0",
+  "description": "Share trade profit and loss tool",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./bin/www.js",
+    "start-dev": "nodemon ./bin/www.js",
+    "test": "mocha ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bigdecimal": "^0.6.1",
+    "body-parser": "^1.19.0",
+    "config": "^3.3.1",
+    "cookie-parser": "^1.4.5",
+    "csv-reader": "^1.0.6",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "moment": "^2.24.0",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "path": "^0.12.7",
+    "req-flash": "0.0.3",
+    "socket.io": "^2.3.0"
+  }
+}
