@@ -13,7 +13,7 @@ const fs = require('fs');
 const CsvReadableStream = require('csv-reader');
 const executeQuery = dbUtil.executeQueryCon;
 
-let inputStream = fs.createReadStream(args[2], 'utf8');
+let inputStream = fs.createReadStream(args[args.length - 1], 'utf8');
 
 async function truncateTables() {
   await new Promise((resolve, reject) => {
@@ -36,9 +36,15 @@ async function truncateTables() {
   })
 }
 
-async function main() {
+function hasFlag(flag) {
+  return args.includes(flag);
+}
 
-  await truncateTables();
+async function main() {
+  if (hasFlag("-t") || hasFlag("--truncate")) {
+    await truncateTables();
+    console.log("Truncated data");
+  }
 
   let promises = [];
   inputStream
@@ -96,10 +102,9 @@ async function populateCumulative() {
                 // If the record does not exist in cumulative, add it.
                 if (result2.length == 0) {
 
-                  let break_even = (config.brokerageAud/result[i]['quantity'])+result[i]['cost_per_unit'];
+                  let break_even = (config.brokerageAud / result[i]['quantity']) + result[i]['cost_per_unit'];
                   await executeQuery(conn, "INSERT INTO trade_cumulative (code, quantity, cost_per_unit, total_cost, last_act, avg_price, break_even) VALUES (?,?,?,?,?,?,?)",
-                    [result[i]['code'], result[i]['action_quantity'], result[i]['cost_per_unit'], result[i]['total_cost'], result[i]['action'], result[i]['price'], break_even
-                    ]);
+                    [result[i]['code'], result[i]['action_quantity'], result[i]['cost_per_unit'], result[i]['total_cost'], result[i]['action'], result[i]['price'], break_even]);
 
                   await executeQuery(conn, "UPDATE trade_records_imported SET processed_for_tc=?, pnl=? WHERE id=?",
                     [1, 0, result[i]['id']]);
@@ -119,8 +124,8 @@ async function populateCumulative() {
                   let new_quantity = result[i]['action_quantity'] + result2[0]['quantity'];
                   let new_total_cost = result[i]['total_cost'] + result2[0]['total_cost'];
                   let new_cost_per_unit = (new_quantity > 0) ? (new_total_cost / new_quantity) : 0;
-                  let avg_price = (result2[0]['quantity']*result2[0]['avg_price'] + result[i]['gross_total'])/(result2[0]['quantity']+result[i]['quantity']);
-                  let break_even = (config.brokerageAud/(new_quantity))+new_cost_per_unit;
+                  let avg_price = (result2[0]['quantity'] * result2[0]['avg_price'] + result[i]['gross_total']) / (result2[0]['quantity'] + result[i]['quantity']);
+                  let break_even = (config.brokerageAud / (new_quantity)) + new_cost_per_unit;
                   let pnl = 0;
                   // no profit if action is the same.
                   if (result2[0]['last_act'] != result[i]['action']) {
@@ -131,7 +136,7 @@ async function populateCumulative() {
                     await executeQuery(conn, "DELETE FROM trade_cumulative WHERE id=?", [result2[0]['id']]);
                   } else {
                     await executeQuery(conn, "UPDATE trade_cumulative SET cost_per_unit=?,quantity=?,total_cost=?,avg_price=?,break_even=? WHERE id=?",
-                      [new_cost_per_unit, new_quantity, new_total_cost,  avg_price, break_even ,result2[0]['id']]);
+                      [new_cost_per_unit, new_quantity, new_total_cost, avg_price, break_even, result2[0]['id']]);
                   }
 
                   await executeQuery(conn, "UPDATE trade_records_imported SET processed_for_tc=?, pnl=? WHERE id=?",
@@ -168,7 +173,7 @@ async function populateCumulative() {
 }
 
 async function processRow(row) {
- 
+
   return new Promise((resolve, reject) => {
     pool.query("SELECT COUNT(*) as c FROM trade_records WHERE order_id=?", [row[8]], async (error, result) => {
 
@@ -188,7 +193,7 @@ async function processRow(row) {
         await new Promise((resolve2, reject2) => {
           pool.query("INSERT INTO trade_records_imported (`date`,`action`,`code`,`quantity`,`action_quantity`,`price`,`filled`,`order_id`,`gross_total`,`total_cost`,`cost_per_unit`,`brokerage`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
             [
-              moment(row[0], "DD/MM/YYYY HH:mm:ss a").toDate(), row[1], row[2], row[3], act_quantity, row[4], row[5], row[8],gross_total, total_cost, cost_per_unit, brokerage.toFixed(4)
+              moment(row[0], "DD/MM/YYYY HH:mm:ss a").toDate(), row[1], row[2], row[3], act_quantity, row[4], row[5], row[8], gross_total, total_cost, cost_per_unit, brokerage.toFixed(4)
             ], (error2, result2) => {
               if (error2) {
                 reject2(error2);
@@ -197,11 +202,11 @@ async function processRow(row) {
               resolve(true)
             });
         });
-      }else {
-        if(row[5] > 0) {
-          console.log("Row "+row[8]+" has already been processed previously. Ignoring.");
-        }else {
-          console.log("Row "+row[8]+" has not been filled. Ignoring.");
+      } else {
+        if (row[5] > 0) {
+          console.log("Row " + row[8] + " has already been processed previously. Ignoring.");
+        } else {
+          console.log("Row " + row[8] + " has not been filled. Ignoring.");
         }
       }
       resolve(true);
