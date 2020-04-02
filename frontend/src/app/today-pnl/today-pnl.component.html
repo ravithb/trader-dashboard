@@ -1,0 +1,10 @@
+<div class="card m-1">
+  <div class="card-header">
+    Today
+  </div>
+  <div [ngClass]="{'card-body': true,'alert-danger':isNegative, 'alert-success':!isNegative}">
+    <div class="font-weight-bold text-center large-text">
+      {{pnl}}
+    </div>
+  </div>
+</div>

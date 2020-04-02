@@ -1,0 +1,25 @@
+<div class="card m-1">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-8">
+        <canvas baseChart [datasets]="chartData" [colors]="chartColors" [labels]="chartLabels" [options]="chartOpts" [legend]="chartLegend" chartType="bar"></canvas>
+      </div>
+      <div class="col-4">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Profit / Loss</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of data">
+              <td class="text-left">{{s['code']}}</td>
+              <td [ngClass]="{'text-right':true, 'alert-danger':s['pnl']<0, 'alert-success':s['pnl']>0}">{{s['pnl']}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
