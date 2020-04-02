@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const libPnl = require('../lib/pnl');
+const moment = require('moment');
+
+const STD_DATE_FORMAT = "YYYY-MM-DD";
+const INPUT_DATE_FORMAT = "YYYYMMDD";
 
 function sendError(res, status, data) {
-  res.sendStatus(status).send(data);
+  res.status(status).send(data);
 }
 
 /* GET home page. */
@@ -35,7 +39,9 @@ router.get('/getPnlByDate/:date', async (req, res) => {
 
 router.get('/getDailyPnls/:start/:end', async (req, res) => {
   try {
-    let pnlVals = await libPnl.getDailyPnls(req.params.start, req.params.end);
+    let startStdStr = moment(req.params.start,INPUT_DATE_FORMAT).format(STD_DATE_FORMAT);
+    let endStdStr = moment(req.params.end,INPUT_DATE_FORMAT).format(STD_DATE_FORMAT);
+    let pnlVals = await libPnl.getDailyPnls(startStdStr, endStdStr);
     res.send({
       "data": pnlVals
     });
@@ -66,6 +72,22 @@ router.get('/getDailyPnlsByCode/:start/:end', async (req, res) => {
       "data": pnlVals
     });
   } catch (e) {
+    sendError(res, 400, {
+      "error": e
+    })
+  }
+});
+
+router.get('/getPnlThisWeek', async (req, res) => {
+  const from_date = moment().startOf('week').format(STD_DATE_FORMAT);
+  const to_date = moment().endOf('week').format(STD_DATE_FORMAT);
+  try {
+    let pnlVals = await libPnl.getPnlForPeriod(from_date, to_date);
+    res.send({
+      "data": pnlVals
+    });
+  } catch (e) {
+    console.log(e);
     sendError(res, 400, {
       "error": e
     })

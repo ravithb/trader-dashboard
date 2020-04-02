@@ -96,7 +96,7 @@ async function populateCumulative() {
                 // If the record does not exist in cumulative, add it.
                 if (result2.length == 0) {
 
-                  let break_even = (config.brokerageAud*2/result[i]['quantity'])+result[i]['price'];
+                  let break_even = (config.brokerageAud/result[i]['quantity'])+result[i]['cost_per_unit'];
                   await executeQuery(conn, "INSERT INTO trade_cumulative (code, quantity, cost_per_unit, total_cost, last_act, avg_price, break_even) VALUES (?,?,?,?,?,?,?)",
                     [result[i]['code'], result[i]['action_quantity'], result[i]['cost_per_unit'], result[i]['total_cost'], result[i]['action'], result[i]['price'], break_even
                     ]);
@@ -120,7 +120,7 @@ async function populateCumulative() {
                   let new_total_cost = result[i]['total_cost'] + result2[0]['total_cost'];
                   let new_cost_per_unit = (new_quantity > 0) ? (new_total_cost / new_quantity) : 0;
                   let avg_price = (result2[0]['quantity']*result2[0]['avg_price'] + result[i]['gross_total'])/(result2[0]['quantity']+result[i]['quantity']);
-                  let break_even = (config.brokerageAud*2/(new_quantity))+avg_price;
+                  let break_even = (config.brokerageAud/(new_quantity))+new_cost_per_unit;
                   let pnl = 0;
                   // no profit if action is the same.
                   if (result2[0]['last_act'] != result[i]['action']) {
@@ -131,7 +131,7 @@ async function populateCumulative() {
                     await executeQuery(conn, "DELETE FROM trade_cumulative WHERE id=?", [result2[0]['id']]);
                   } else {
                     await executeQuery(conn, "UPDATE trade_cumulative SET cost_per_unit=?,quantity=?,total_cost=?,avg_price=?,break_even=? WHERE id=?",
-                      [new_cost_per_unit, new_quantity, new_total_cost, result2[0]['id'], avg_price, break_even]);
+                      [new_cost_per_unit, new_quantity, new_total_cost,  avg_price, break_even ,result2[0]['id']]);
                   }
 
                   await executeQuery(conn, "UPDATE trade_records_imported SET processed_for_tc=?, pnl=? WHERE id=?",

@@ -8,6 +8,11 @@ module.exports = {
     return res[0]['pnl'];
   },
 
+  getPnlForPeriod: async (start,end) => {
+    let res = await db.executeQuery("SELECT SUM(pnl) as pnl FROM trade_records WHERE pnl!=0  AND DATE(`date`) BETWEEN ? and ? GROUP BY DATE(`date`)",[start,end])
+    return res[0]['pnl'];
+  },
+
   getPnlByDate: async (dateStr) => {
     let dateStdStr = moment(dateStr,"YYYYMMDD").format("YYYY-MM-DD");
     let res = await db.executeQuery("SELECT SUM(pnl) as pnl FROM trade_records WHERE pnl!=0 And DATE(`date`)=?",[dateStdStr]);
@@ -15,9 +20,7 @@ module.exports = {
   },
 
   getDailyPnls: async (start, end) => {
-    let startStdStr = moment(start,"YYYYMMDD").format("YYYY-MM-DD");
-    let endStdStr = moment(end,"YYYYMMDD").format("YYYY-MM-DD");
-    let res = await db.executeQuery("SELECT Date(`date`) as date, SUM(pnl) as pnl FROM trade_records WHERE pnl!=0 And DATE(`date`) BETWEEN ? and ? GROUP BY DATE(`date`)",[startStdStr,endStdStr]);
+    let res = await db.executeQuery("SELECT Date(`date`) as date, SUM(pnl) as pnl FROM trade_records WHERE pnl!=0 AND DATE(`date`) BETWEEN ? and ? GROUP BY DATE(`date`)",[start,end]);
     return res;
   },
 
