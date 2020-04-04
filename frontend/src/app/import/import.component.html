@@ -1,0 +1,5 @@
+<div style="float:right;">
+  <input type="file" #fileUpload id="fileUpload" name="fileUpload" accept="text/csv" style="display: none"/>
+  <button type="button" (click)="onClickImport()">Import</button>
+  <span *ngIf="uploadedFile && uploadedFile.inProgress">{{uploadedFile.progress}}%</span>
+</div>

@@ -1,0 +1,8 @@
+{
+  "mysqlUser":"trader",
+  "mysqlHost":"db",
+  "mysqlPort":3306,
+  "mysqlPass":"cXWg5AQOBIi39ibZ",
+  "mysqlDb":"trader",
+  "brokerageAud":14.95
+}

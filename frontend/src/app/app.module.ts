@@ -11,6 +11,8 @@ import { ApiService } from './services/api.service';
 import { ChartsModule } from 'ng2-charts';
 import { TodayPnlComponent } from './today-pnl/today-pnl.component';
 import { WeekPnlDetailComponent } from './week-pnl-detail/week-pnl-detail.component';
+import { ImportComponent } from './import/import.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -20,12 +22,14 @@ import { WeekPnlDetailComponent } from './week-pnl-detail/week-pnl-detail.compon
     WeeklyPnlComponent,
     CodePnlComponent,
     TodayPnlComponent,
-    WeekPnlDetailComponent
+    WeekPnlDetailComponent,
+    ImportComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ChartsModule
+    ChartsModule,
+    HttpClientModule
   ],
   providers: [
     ApiService

@@ -1,0 +1,41 @@
+version: '3'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8004:80"
+    image: ravithb/fleet-mgmt-frontend
+    links:
+      - service
+    depends_on:
+      - service
+  service:
+    build: ./service
+    ports:
+      - "3000:3000"
+    image: ravithb/fleet-mgmt-service
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      - env=prod
+      - NODE_ENV=prod
+      - apiUrlPrefix=""
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+      - ./mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: cXWg5AQOBIi39ibZ
+      MYSQL_DATABASE: trader
+      MYSQL_USER: trader
+      MYSQL_PASSWORD: cXWg5AQOBIi39ibZ
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

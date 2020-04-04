@@ -41,7 +41,6 @@ export class CodePnlComponent implements OnInit,AfterViewInit {
         this.chartColors.push(color);
         this.chartData[0].backgroundColor.push(color);
       }
-      console.log(this.chartColors);
     })
   }
 

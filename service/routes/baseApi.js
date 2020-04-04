@@ -3,6 +3,11 @@ const router = express.Router();
 const libPnl = require('../lib/pnl');
 const moment = require('moment');
 
+const multer = require('multer');
+const upload = multer({dest:'/tmp'});
+
+const impUtils = require('../lib/import-utils');
+
 const STD_DATE_FORMAT = "YYYY-MM-DD";
 const INPUT_DATE_FORMAT = "YYYYMMDD";
 
@@ -106,5 +111,26 @@ router.get('/getPortfolio', async (req, res) => {
     })
   }
 });
+
+router.post('/uploadTradingFile', upload.single('tfile'), async (req,res)=>{
+
+  if(!req.file) {
+    sendError(res, 400,{
+      "error": "No file upload detected under key 'tfile'"
+    });
+    return;
+  }
+
+  try{
+    let impResult = await impUtils.doImportFile(req.file.path);
+
+    res.send({
+      "data": "OK"
+    })
+  } catch(e) {
+    console.log(e);
+    sendError(res,400,e);
+  }
+})
 
 module.exports = router;
