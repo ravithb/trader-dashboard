@@ -44,6 +44,7 @@ export class ImportComponent implements OnInit {
         let body = resp.body;
         if(body && body.data) {
           this.uploadedFile.progress = body.data;
+          this.uploadService.notifyUpload();
         }else {
           this.uploadedFile.progress = body.error;
         }

@@ -30,42 +30,15 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `trade_cumulative`;
 CREATE TABLE `trade_cumulative` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `code` varchar(10) NOT NULL,
   `quantity` int(11) NOT NULL,
-  `avg_price` decimal(10,4) NOT NULL,
-  `break_even` decimal(10,4) NOT NULL,
-  `cost_per_unit` decimal(10,4) NOT NULL,
-  `last_act` varchar(4) DEFAULT NULL,
-  `total_cost` decimal(10,4) NOT NULL
+  `avg_cost` decimal(10,6) NOT NULL,
+  `break_even` decimal(10,6) NOT NULL,
+  `cost_per_unit` decimal(10,6) NOT NULL,
+  `total_cost` decimal(10,6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `trade_records`
--- (See below for the actual view)
---
-DROP VIEW IF EXISTS `trade_records`;
-CREATE TABLE `trade_records` (
-`id` bigint(20)
-,`date` datetime
-,`action` varchar(4)
-,`code` varchar(10)
-,`quantity` int(11)
-,`action_quantity` int(11)
-,`price` decimal(10,4)
-,`filled` int(11)
-,`order_id` bigint(20)
-,`gross_total` decimal(10,4)
-,`brokerage` decimal(10,4)
-,`total_cost` decimal(10,4)
-,`cost_per_unit` decimal(10,4)
-,`processed_for_tc` tinyint(1)
-,`pnl` decimal(10,4)
-);
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `trade_records_imported`
@@ -73,21 +46,20 @@ CREATE TABLE `trade_records` (
 
 DROP TABLE IF EXISTS `trade_records_imported`;
 CREATE TABLE `trade_records_imported` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `date` datetime NOT NULL,
   `action` varchar(4) NOT NULL,
   `code` varchar(10) NOT NULL,
   `quantity` int(11) NOT NULL,
-  `action_quantity` int(11) NOT NULL,
-  `price` decimal(10,4) NOT NULL,
-  `filled` int(11) NOT NULL,
-  `order_id` bigint(20) NOT NULL,
-  `gross_total` decimal(10,4) NOT NULL,
-  `brokerage` decimal(10,4) NOT NULL,
-  `total_cost` decimal(10,4) NOT NULL,
-  `cost_per_unit` decimal(10,4) NOT NULL,
+  `price` decimal(10,6) NOT NULL,
+  `confirmation_no` bigint(20) NOT NULL,
+  `gross_total` decimal(10,6) NOT NULL,
+  `fees` decimal(10,6) NOT NULL,
+  `total_cost` decimal(10,6) NOT NULL,
+  `cost_per_unit` decimal(10,6) NOT NULL,
   `processed_for_tc` tinyint(1) NOT NULL DEFAULT '0',
-  `pnl` decimal(10,4) NOT NULL DEFAULT '0.0000'
+  `pnl` decimal(10,6) NOT NULL DEFAULT '0.0000',
+  `break_even_flag` tinyint NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -95,9 +67,14 @@ CREATE TABLE `trade_records_imported` (
 --
 -- Structure for view `trade_records`
 --
-DROP TABLE IF EXISTS `trade_records`;
+DROP VIEW IF EXISTS `trade_records`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `trade_records`  AS  select `trade_records_imported`.`id` AS `id`,`trade_records_imported`.`date` AS `date`,`trade_records_imported`.`action` AS `action`,`trade_records_imported`.`code` AS `code`,`trade_records_imported`.`quantity` AS `quantity`,`trade_records_imported`.`action_quantity` AS `action_quantity`,`trade_records_imported`.`price` AS `price`,`trade_records_imported`.`filled` AS `filled`,`trade_records_imported`.`order_id` AS `order_id`,`trade_records_imported`.`gross_total` AS `gross_total`,`trade_records_imported`.`brokerage` AS `brokerage`,`trade_records_imported`.`total_cost` AS `total_cost`,`trade_records_imported`.`cost_per_unit` AS `cost_per_unit`,`trade_records_imported`.`processed_for_tc` AS `processed_for_tc`,`trade_records_imported`.`pnl` AS `pnl` from `trade_records_imported` order by `trade_records_imported`.`date` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `trade_records`  AS  select `trade_records_imported`.`id` AS `id`,`trade_records_imported`.`date` AS `date`,
+`trade_records_imported`.`action` AS `action`,`trade_records_imported`.`code` AS `code`,`trade_records_imported`.`quantity` AS `quantity`,
+`trade_records_imported`.`price` AS `price`,`trade_records_imported`.`confirmation_no` AS `confirmation_no`,`trade_records_imported`.`gross_total` AS `gross_total`,`trade_records_imported`.`fees` AS `fees`,
+`trade_records_imported`.`total_cost` AS `total_cost`,`trade_records_imported`.`cost_per_unit` AS `cost_per_unit`,`trade_records_imported`.`processed_for_tc` AS `processed_for_tc`,`trade_records_imported`.`pnl` AS `pnl` ,
+`trade_records_imported`.`break_even_flag` as `break_even_flag`
+from `trade_records_imported` order by `trade_records_imported`.`date`, `trade_records_imported`.`confirmation_no` ;
 
 --
 -- Indexes for dumped tables
@@ -126,14 +103,21 @@ ALTER TABLE `trade_records_imported`
 -- AUTO_INCREMENT for table `trade_cumulative`
 --
 ALTER TABLE `trade_cumulative`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `trade_records_imported`
 --
 ALTER TABLE `trade_records_imported`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT, AUTO_INCREMENT=1;
 COMMIT;
+
+
+DROP VIEW IF EXISTS `daily_pnl`;
+CREATE VIEW `daily_pnl` AS SELECT SUM(pnl) as profit_loss,date FROM `trade_records` GROUP BY date;
+
+TRUNCATE `trade_cumulative`;
+TRUNCATE `trade_records_imported`;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

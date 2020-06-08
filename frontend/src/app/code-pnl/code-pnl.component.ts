@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
+import { UploadService } from '../services/upload.service';
 
 @Component({
   selector: 'app-code-pnl',
@@ -21,17 +22,24 @@ export class CodePnlComponent implements OnInit,AfterViewInit {
   chartColors = [];
   data = [];
 
-  constructor(private apiService:ApiService) { }
+  constructor(private apiService:ApiService,private uploadService:UploadService) { }
 
   ngOnInit() {
-
+    this.uploadService.getImportObservable().subscribe(r=>{
+      this.refresh();
+    })
   }
 
   ngAfterViewInit() {
+    this.refresh();
+  }
+
+  refresh() {
     this.populateChartData().subscribe(r=>{
       this.data = r;
       this.chartData[0].data = [];
       this.chartColors = [];
+      this.chartLabels = [];
       this.chartData[0].backgroundColor = [];
       for(let i in r) {
         let row = r[i];

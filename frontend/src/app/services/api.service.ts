@@ -22,6 +22,26 @@ export class ApiService {
         }));
   }
 
+  getBestDay() {
+    return ajax.getJSON(environment.apiUrl + "/getBestDay")
+      .pipe(
+        map((resp: any) => resp.data),
+        catchError(e => {
+          console.log(e);
+          return of(e);
+        }));
+  }
+
+  getWorstDay() {
+    return ajax.getJSON(environment.apiUrl + "/getWorstDay")
+      .pipe(
+        map((resp: any) => resp.data),
+        catchError(e => {
+          console.log(e);
+          return of(e);
+        }));
+  }
+
   getPnlThisWeek() {
     return ajax.getJSON(environment.apiUrl + "/getPnlThisWeek")
       .pipe(
@@ -55,6 +75,16 @@ export class ApiService {
 
   getPnlsByCode() {
     return ajax.getJSON(environment.apiUrl + "/getPnlsByCode")
+      .pipe(
+        map((resp: any) => resp.data),
+        catchError(e => {
+          console.log(e);
+          return of(e);
+        }));
+  }
+
+  getWinLooseCounts() {
+    return ajax.getJSON(environment.apiUrl + "/getWinLooseCounts")
       .pipe(
         map((resp: any) => resp.data),
         catchError(e => {

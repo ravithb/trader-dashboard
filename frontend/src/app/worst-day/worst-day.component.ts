@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { UploadService } from '../services/upload.service';
+import * as moment from 'moment';
 
 @Component({
-  selector: 'app-pnl',
-  templateUrl: './pnl.component.html',
-  styleUrls: ['./pnl.component.scss']
+  selector: 'app-worst-day',
+  templateUrl: './worst-day.component.html',
+  styleUrls: ['./worst-day.component.scss']
 })
-export class PnlComponent implements OnInit {
+export class WorstDayComponent implements OnInit {
 
-  pnl = 0;
+  worst_day_val = 0;
+  worst_date='';
 
   constructor(private apiService: ApiService,private uploadService:UploadService) { }
 
@@ -25,13 +27,14 @@ export class PnlComponent implements OnInit {
   }
 
   refresh() {
-    this.apiService.getPnl().subscribe((p)=>{
-      this.pnl = p.toFixed(2);
+    this.apiService.getWorstDay().subscribe((p)=>{
+      this.worst_day_val = p.profit_loss.toFixed(2);
+      this.worst_date = moment(p.date).format('YYYY-MMM-DD')
     })
   }
 
   get isNegative() {
-    return this.pnl < 0;
+    return this.worst_day_val < 0;
   }
 
 }

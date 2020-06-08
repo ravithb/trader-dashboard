@@ -55,10 +55,34 @@ module.exports = {
   },
 
   getPortolio: async () => {
-    let res = await db.executeQuery("SELECT code, quantity, cost_per_unit, total_cost, avg_price, break_even FROM trade_cumulative");
+    let res = await db.executeQuery("SELECT code, quantity, cost_per_unit, total_cost, avg_cost, break_even FROM trade_cumulative");
     if(!res) {
       return [];
     }
     return res;
-  }
+  },
+
+  getBestDay : async () => {
+    let res = await db.executeQuery("SELECT dp.* FROM `daily_pnl` dp JOIN (SELECT MAX(profit_loss) mp FROM daily_pnl) sub ON sub.mp=dp.profit_loss ORDER BY dp.date DESC LIMIT 1",[]);
+    if(!res || res.length == 0) {
+      return {};
+    }
+    return res[0];
+  },
+
+  getWorstDay : async () => {
+    let res = await db.executeQuery("SELECT dp.* FROM `daily_pnl` dp JOIN (SELECT MIN(profit_loss) mp FROM daily_pnl) sub ON sub.mp=dp.profit_loss ORDER BY dp.date DESC LIMIT 1",[]);
+    if(!res || res.length == 0) {
+      return {};
+    }
+    return res[0];
+  },
+
+  getWinLooseCounts: async () => {
+    let res = await db.executeQuery("SELECT COUNT(IF( pnl>0, 1, NULL)) winners, COUNT(IF( pnl<0, 1,NULL)) losers, COUNT(IF (break_even_flag=1,1,NULL)) break_evens, COUNT(IF(pnl>0 OR pnl<0 OR break_even_flag=1,1,NULL)) AS all_trades FROM `trade_records`",[]);
+    if(!res || res.length == 0) {
+      return {};
+    }
+    return res[0];
+  },
 }

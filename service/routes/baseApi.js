@@ -112,6 +112,45 @@ router.get('/getPortfolio', async (req, res) => {
   }
 });
 
+router.get('/getBestDay', async (req, res) => {
+  try {
+    let pnlVals = await libPnl.getBestDay();
+    res.send({
+      "data": pnlVals
+    });
+  } catch (e) {
+    sendError(res, 400, {
+      "error": e
+    })
+  }
+});
+
+router.get('/getWorstDay', async (req, res) => {
+  try {
+    let pnlVals = await libPnl.getWorstDay();
+    res.send({
+      "data": pnlVals
+    });
+  } catch (e) {
+    sendError(res, 400, {
+      "error": e
+    })
+  }
+});
+
+router.get('/getWinLooseCounts', async (req, res) => {
+  try {
+    let pnlVals = await libPnl.getWinLooseCounts();
+    res.send({
+      "data": pnlVals
+    });
+  } catch (e) {
+    sendError(res, 400, {
+      "error": e
+    })
+  }
+});
+
 router.post('/uploadTradingFile', upload.single('tfile'), async (req,res)=>{
 
   if(!req.file) {

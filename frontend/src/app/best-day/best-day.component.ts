@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { UploadService } from '../services/upload.service';
+import * as moment from 'moment';
 
 @Component({
-  selector: 'app-pnl',
-  templateUrl: './pnl.component.html',
-  styleUrls: ['./pnl.component.scss']
+  selector: 'app-best-day',
+  templateUrl: './best-day.component.html',
+  styleUrls: ['./best-day.component.scss']
 })
-export class PnlComponent implements OnInit {
+export class BestDayComponent implements OnInit {
 
-  pnl = 0;
+  best_day_val = 0;
+  best_date='';
 
   constructor(private apiService: ApiService,private uploadService:UploadService) { }
 
@@ -25,13 +27,14 @@ export class PnlComponent implements OnInit {
   }
 
   refresh() {
-    this.apiService.getPnl().subscribe((p)=>{
-      this.pnl = p.toFixed(2);
+    this.apiService.getBestDay().subscribe((p)=>{
+      this.best_day_val = p.profit_loss.toFixed(2);
+      this.best_date = moment(p.date).format('YYYY-MMM-DD')
     })
   }
 
   get isNegative() {
-    return this.pnl < 0;
+    return this.best_day_val < 0;
   }
 
 }

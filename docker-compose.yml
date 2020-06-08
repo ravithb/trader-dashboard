@@ -12,7 +12,7 @@ services:
   service:
     build: ./service
     ports:
-      - "3000:3000"
+      - "3033:3000"
     image: ravithb/fleet-mgmt-service
     depends_on:
       - db
@@ -38,4 +38,4 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 8089:8080

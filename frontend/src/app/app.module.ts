@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PnlComponent } from './pnl/pnl.component';
+import { BestDayComponent } from './best-day/best-day.component';
+import { WorstDayComponent } from './worst-day/worst-day.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
 import { WeeklyPnlComponent } from './weekly-pnl/weekly-pnl.component';
 import { CodePnlComponent } from './code-pnl/code-pnl.component';
@@ -13,6 +15,7 @@ import { TodayPnlComponent } from './today-pnl/today-pnl.component';
 import { WeekPnlDetailComponent } from './week-pnl-detail/week-pnl-detail.component';
 import { ImportComponent } from './import/import.component';
 import { HttpClientModule } from '@angular/common/http';
+import { WinLoosePieComponent } from './win-loose-pie/win-loose-pie.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +26,10 @@ import { HttpClientModule } from '@angular/common/http';
     CodePnlComponent,
     TodayPnlComponent,
     WeekPnlDetailComponent,
-    ImportComponent
+    ImportComponent,
+    BestDayComponent,
+    WorstDayComponent,
+    WinLoosePieComponent
   ],
   imports: [
     BrowserModule,

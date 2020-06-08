@@ -6,6 +6,11 @@ body {
 }
 
 .large-text {
-  font-size:2rem;
+  font-size:1.9rem;
   font-weight: bold;
+}
+
+.card {
+  min-width: 11.5rem !important;
+  min-height: 9.3rem !important;
 }
