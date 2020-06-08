@@ -84,33 +84,19 @@ from `trade_records_imported` order by `trade_records_imported`.`date`, `trade_r
 -- Indexes for table `trade_cumulative`
 --
 ALTER TABLE `trade_cumulative`
-  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `code` (`code`);
 
 --
 -- Indexes for table `trade_records_imported`
 --
 ALTER TABLE `trade_records_imported`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `idx_order_id` (`order_id`),
+  ADD UNIQUE KEY `idx_conf_no` (`confirmation_no`),
   ADD KEY `idx_code` (`code`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
---
--- AUTO_INCREMENT for table `trade_cumulative`
---
-ALTER TABLE `trade_cumulative`
-  MODIFY `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, AUTO_INCREMENT=1;
-
---
--- AUTO_INCREMENT for table `trade_records_imported`
---
-ALTER TABLE `trade_records_imported`
-  MODIFY `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT, AUTO_INCREMENT=1;
-COMMIT;
 
 
 DROP VIEW IF EXISTS `daily_pnl`;
@@ -118,6 +104,8 @@ CREATE VIEW `daily_pnl` AS SELECT SUM(pnl) as profit_loss,date FROM `trade_recor
 
 TRUNCATE `trade_cumulative`;
 TRUNCATE `trade_records_imported`;
+
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -3,7 +3,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "8004:80"
+      - "8044:80"
     image: ravithb/fleet-mgmt-frontend
     links:
       - service
@@ -38,4 +38,4 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8089:8080
+      - 8049:8080
